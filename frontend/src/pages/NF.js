@@ -1,20 +1,51 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import PageTitle from '../components/Typography/PageTitle';
-import { Button, Input, Label, Table, TableHeader, TableCell, TableRow, TableBody, TableContainer } from '@windmill/react-ui';
+import { Button, Input, Label } from '@windmill/react-ui';
 
 function NotaFiscal() {
   const [companyId, setCompanyId] = useState('');
   const [companyKey, setCompanyKey] = useState('');
   const [loading, setLoading] = useState(false);
-  const [notas, setNotas] = useState([]);
-  const [notaId, setNotaId] = useState('');
-  const [notaDetalhe, setNotaDetalhe] = useState(null);
+  const [cliente, setCliente] = useState({
+    RUC: '',
+    Razao_Social: '',
+    Direção: '',
+    NumeroCasa: '',
+    Departamento: '',
+    Distrito: '',
+    Cidade: '',
+    CidadeDescrição: '',
+    Pais: '',
+    Celular: '',
+    Email: ''
+  });
+  const [itens, setItens] = useState([]);
+  const [novoItem, setNovoItem] = useState({ 
+    Codigo: '',
+    Descrição: '',
+    NCM: '',
+    Quantidade: 1,
+    PreçoUnitario: 0,
+    Pais: '',
+    PaisDescrição: '',
+    ivaTipo: '',
+    ivaBase: '',
+    iva: ''
+  });
 
   const handleGenerate = async () => {
     if (!companyId || !companyKey) {
       alert('Por favor, insira o ID da empresa e a chave da empresa.');
       return;
     }
+
+    const requestBody = {
+      name: 'Nova Nota Fiscal',
+      data: {
+        cliente,
+        items: itens
+      }
+    };
 
     setLoading(true);
     try {
@@ -25,12 +56,11 @@ function NotaFiscal() {
           'x-company': companyId,
           'x-api-key': companyKey
         },
-        body: JSON.stringify({ name: 'Nova Nota Fiscal' })
+        body: JSON.stringify(requestBody)
       });
       
       if (!response.ok) throw new Error('Erro ao gerar a nota fiscal.');
       alert('Nota fiscal gerada com sucesso!');
-      fetchNotas();
     } catch (error) {
       alert(error.message);
     } finally {
@@ -38,50 +68,17 @@ function NotaFiscal() {
     }
   };
 
-  const fetchNotas = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(`http://localhost:3000/receipt`, {
-        method: 'GET',
-        headers: { 'x-company': companyId }
-      });
-      
-      if (!response.ok) throw new Error('Erro ao obter notas fiscais.');
-      const data = await response.json();
-      setNotas(data);
-    } catch (error) {
-      alert(error.message);
-    } finally {
-      setLoading(false);
-    }
+  const adicionarItem = () => {
+    setItens([...itens, novoItem]);
+    setNovoItem({ Codigo: '', Descrição: '', NCM: '', Quantidade: 1, PreçoUnitario: 0, Pais: '', PaisDescrição: '', ivaTipo: '', ivaBase: '', iva: '' });
   };
 
-  const fetchNotaById = async () => {
-    if (!notaId) {
-      alert('Digite o ID da nota fiscal.');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const response = await fetch(`http://localhost:3000/receipt/${notaId}`, {
-        method: 'GET',
-        headers: { 'x-company': companyId }
-      });
-      
-      if (!response.ok) throw new Error('Nota fiscal não encontrada.');
-      const data = await response.json();
-      setNotaDetalhe(data);
-    } catch (error) {
-      alert(error.message);
-    } finally {
-      setLoading(false);
+  const removerItem = (index) => {
+    const confirmDelete = window.confirm("Tem certeza que deseja remover este item?");
+    if (confirmDelete) {
+      setItens(itens.filter((_, i) => i !== index));
     }
   };
-
-  useEffect(() => {
-    if (companyId) fetchNotas();
-  }, [companyId]);
 
   return (
     <>
@@ -89,73 +86,52 @@ function NotaFiscal() {
       <div className="light-gray-box">
         <Label>
           <span>ID da Empresa</span>
-          <Input 
-            type="text" 
-            value={companyId} 
-            onChange={(e) => setCompanyId(e.target.value)} 
-            placeholder="ID da empresa" 
-          />
+          <Input type="text" value={companyId} onChange={(e) => setCompanyId(e.target.value)} placeholder="ID da empresa" />
         </Label>
         <Label className="mt-2">
           <span>Chave da Empresa</span>
-          <Input 
-            type="text" 
-            value={companyKey} 
-            onChange={(e) => setCompanyKey(e.target.value)} 
-            placeholder="Chave da empresa" 
-          />
+          <Input type="text" value={companyKey} onChange={(e) => setCompanyKey(e.target.value)} placeholder="Chave da empresa" />
         </Label>
-        <Button className="mt-4" onClick={handleGenerate} disabled={loading}>
-          {loading ? 'Gerando...' : 'Gerar Nota Fiscal'}
-        </Button>
       </div>
       
-      <div className="mt-6">  
-        <Label>
-          <span>Buscar Nota Fiscal por ID</span>
-          <Input 
-            type="text" 
-            value={notaId} 
-            onChange={(e) => setNotaId(e.target.value)} 
-            placeholder="ID da nota fiscal" 
-          />
-        </Label>
-        <Button className="mt-2" onClick={fetchNotaById} disabled={loading}>
-          {loading ? 'Buscando...' : 'Buscar Nota Fiscal'}
-        </Button>
+      <div className="mt-6">
+        <h2>Dados do Cliente</h2>
+        {Object.keys(cliente).map((key) => (
+          <Label key={key} className="mt-2">
+            <span>{key}</span>
+            <Input type="text" value={cliente[key]} onChange={(e) => setCliente({ ...cliente, [key]: e.target.value })} placeholder={key} />
+          </Label>
+        ))}
       </div>
       
-      {notaDetalhe && (
-        <div className="mt-6 p-4 border rounded">
-          <h2>Detalhes da Nota Fiscal</h2>
-          <p><strong>ID:</strong> {notaDetalhe._id}</p>
-          <p><strong>Descrição:</strong> {notaDetalhe.descrição}</p>
-          <p><strong>Criado em:</strong> {notaDetalhe.data}</p>
-        </div>
-      )}
+      <div className="mt-6">
+        <h2>Itens da Nota Fiscal</h2>
+        {Object.keys(novoItem).map((key) => (
+          <Label key={key} className="mt-2">
+            <span>{key}</span>
+            <Input type="text" value={novoItem[key]} onChange={(e) => setNovoItem({ ...novoItem, [key]: e.target.value })} placeholder={key} />
+          </Label>
+        ))}
+        <Button className="mt-2" onClick={adicionarItem}>Adicionar Item</Button>
+      </div>
+
+      <div className="mt-6">
+        <h2>Itens Adicionados</h2>
+        {itens.map((item, index) => (
+          <div key={index} className="mt-2 p-2 border rounded bg-gray-900 text-white">
+            {Object.keys(item).map((key) => (
+              <p key={key}><strong>{key}:</strong> {item[key]}</p>
+            ))} 
+            <Button className="mt-2" onClick={() => removerItem(index)}>Remover</Button>
+          </div>
+        ))}
+      </div>
       
-      <TableContainer className="mt-6">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Descrição</TableCell>
-              <TableCell>Data de Criação</TableCell>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {notas.map((nota) => (
-              <TableRow key={nota._id}>
-                <TableCell>{nota._id}</TableCell>
-                <TableCell>{nota.descrição}</TableCell>
-                <TableCell>{nota.data}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Button className="mt-4" onClick={handleGenerate} disabled={loading}>
+        {loading ? 'Gerando' : 'Gerar Nota Fiscal'}
+      </Button>
     </>
   );
-} 
+}
 
 export default NotaFiscal;

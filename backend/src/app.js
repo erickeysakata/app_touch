@@ -6,6 +6,7 @@ const vendasRouter = require('./routes/VendasRoutes');
 const empresaRouter = require('./routes/EmpresaRoutes');
 const vendasProdutoRouter = require('./routes/VendaProdutoRoutes');
 const relatorioRouter = require('./routes/RelatorioRoutes');
+const clienteRouter = require('./routes/ClienteRoutes');
 app.use(cors());
 app.use(express.json());
 
@@ -14,7 +15,7 @@ app.use('/', vendasRouter);
 app.use('/', empresaRouter);
 app.use('/',vendasProdutoRouter );
 app.use('/', relatorioRouter);
-
+app.use('/', clienteRouter);
 
 
 app.listen(3001, () => {

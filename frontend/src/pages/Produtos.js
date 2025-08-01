@@ -30,7 +30,7 @@ function ProductTables() {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [modalType, setModalType] = useState(''); // 'create' ou 'edit'
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [formData, setFormData] = useState({ nome: '', preco: '', estoque: '' });
+  const [formData, setFormData] = useState({ nome: '', preco: ''});
 
   // Buscar produtos
   const fetchProducts = async () => {
@@ -103,7 +103,7 @@ function ProductTables() {
   const openModal = (type, product = null) => {
     setModalType(type);
     setSelectedProduct(product);
-    setFormData(product || { nome: '', preco: '', estoque: '' });
+    setFormData(product || { nome: '', preco: ''});
     setIsModalOpen(true);
   };
 
@@ -111,7 +111,7 @@ function ProductTables() {
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedProduct(null);
-    setFormData({ nome: '', preco: '', estoque: '' });
+    setFormData({ nome: '', preco: ''});
   };
 
   // Abrir modal de confirmação para deletar
@@ -158,7 +158,6 @@ function ProductTables() {
             <tr>
               <TableCell>Nome</TableCell>
               <TableCell>Preço</TableCell>
-              <TableCell>Estoque</TableCell>
               <TableCell>Ações</TableCell>
             </tr>
           </TableHeader>
@@ -167,7 +166,6 @@ function ProductTables() {
               <TableRow key={product.id}>
                 <TableCell>{product.nome}</TableCell>
                 <TableCell>R$ {product.preco.toFixed(2)}</TableCell>
-                <TableCell>{product.estoque}</TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-4">
                     <Button layout="link" size="icon" onClick={() => openModal('edit', product)}>
@@ -198,15 +196,11 @@ function ProductTables() {
         <ModalBody>
           <Label>
             <span>Nome</span>
-            <Input name="nome" value={formData.nome} onChange={handleChange} />
+            <Input name="nome" value={formData.nome} required onChange={handleChange} />
           </Label>
           <Label className="mt-4">
             <span>Preço</span>
-            <Input name="preco" value={formData.preco} onChange={handleChange} type="number" step="0.01" />
-          </Label>
-          <Label className="mt-4">
-            <span>Estoque</span>
-            <Input name="estoque" value={formData.estoque} onChange={handleChange} type="number" />
+            <Input name="preco"  value={formData.preco} required onChange={handleChange} type="number" step="0.01" />
           </Label>
         </ModalBody>
         <ModalFooter>

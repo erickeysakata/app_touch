@@ -26,6 +26,7 @@ router.post('/empresas', (req, res) => {
     });
 });
 
+
 // Rota para atualizar uma empresa
 router.put('/empresas/:id', (req, res) => {
     const { cnpj, senha } = req.body;
@@ -62,5 +63,11 @@ router.post('/empresas/login', (req, res) => {
         }
     });
 });
+
+
+
+
+
+
 
 module.exports = router;

@@ -1,3 +1,4 @@
+
 const sqlite3 = require('sqlite3').verbose();
 
 let db = new sqlite3.Database('./database.db', (err) => {
@@ -12,8 +13,8 @@ let db = new sqlite3.Database('./database.db', (err) => {
         `CREATE TABLE IF NOT EXISTS PRODUTOS (
         id INTEGER PRIMARY KEY, 
         nome TEXT,
-        preco REAL NOT NULL, 
-        estoque INTEGER NOT NULL)`, 
+        preco REAL NOT NULL
+        )`, 
         (err) => {
             if (err) {
                 console.error(err.message);
@@ -23,12 +24,16 @@ let db = new sqlite3.Database('./database.db', (err) => {
         }
     );
 
+
     // Criação da tabela VENDAS
     db.run(
         `CREATE TABLE IF NOT EXISTS VENDAS (
             id INTEGER PRIMARY KEY,
             data_hora TEXT DEFAULT (datetime('now','localtime')),
-            total REAL NOT NULL
+            pagamento TEXT,
+            total REAL NOT NULL,
+            clientes_id INTEGER,
+            FOREIGN KEY(clientes_id) REFERENCES CLIENTES(id) on DELETE CASCADE
         )`,
         (err) => {
             if (err) {
@@ -76,10 +81,12 @@ let db = new sqlite3.Database('./database.db', (err) => {
 db.run(`PRAGMA foreign_keys = ON`);
 
 
-
+db.run(`CREATE TABLE IF NOT EXISTS CLIENTES (
+    id INTEGER PRIMARY KEY,
+    ruc TEXT NOT NULL,
+    nome TEXT NOT NULL,
+    email TEXT NOT NULL )`,
+    );
 }
 );
-
-
-
 module.exports = db;

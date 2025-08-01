@@ -1,7 +1,6 @@
 const express = require('express');
-const { createVendas, readVendas, updateVendas, deleteVendas, readVendasDetalhes, 
+const { createVendas, readVendas, updateVendas, deleteVendas, readVendasDetalhes,updatePagamento, linkClientToSale, 
  } = require('../controllers/ControllerVendas');
-const db = require('../configDB');
 
 const router = express.Router();
 
@@ -27,7 +26,8 @@ router.post('/vendas', (req, res) => {
     if (err) {
       res.status(500).send(err.message);
     } else {
-      res.status(201).send(`Venda criada com sucesso. ID: ${vendaId}`);
+      res.status(201).json({id: vendaId});
+
     }
   });
 });
@@ -35,7 +35,8 @@ router.post('/vendas', (req, res) => {
 // Rota para atualizar uma venda
 router.put('/vendas/:id', (req, res) => {
   const { total } = req.body;
-  updateVendas(req.params.id, total, (err,venda) => {
+  const { pagamento } = req.body;
+  updateVendas(req.params.id, total, pagamento, (err,venda) => {
     if (err) {
       res.status(500).send(err.message);
     } else {
@@ -69,5 +70,30 @@ router.get('/venda_detalhe/:id', (req, res) => {
     }
   });
 });
+// Rota para atualizar o pagamento de uma venda
+router.put('/vendas/pagamento/:id', (req, res) => {
+  const { pagamento } = req.body;
+  updatePagamento(req.params.id, pagamento, (err) => {
+    if (err) {
+      res.status(500).send(err.message);
+    } else {
+      res.status(200).send('Pagamento atualizado com sucesso');
+    }
+  });
+});
+
+// Rota para associar um cliente a uma venda
+router.put('/vendas/clientes/:id', (req, res) => {
+  const { cliente_id } = req.body;
+  linkClientToSale(req.params.id, cliente_id, (err) => {
+    if (err) {
+      res.status(500).send(err.message);
+    } else {
+      res.status(200).send('Cliente associado à venda com sucesso');
+    }
+  });
+});
+
+
 
 module.exports = router;

@@ -53,7 +53,6 @@ class Reports extends Component {
                 <TableCell>Produto</TableCell>
                 <TableCell>Quantidade Vendida</TableCell>
                 <TableCell>Faturamento</TableCell>
-                <TableCell>Estoque</TableCell>
               </tr>
             </TableHeader>
             <TableBody>
@@ -62,7 +61,6 @@ class Reports extends Component {
                   <TableCell>{product.nome}</TableCell>
                   <TableCell>{product.total}</TableCell>
                   <TableCell>R${(product.total*product.preco).toFixed(2)}</TableCell>
-                  <TableCell>{product.estoque}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

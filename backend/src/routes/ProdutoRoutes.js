@@ -14,8 +14,8 @@ router.get('/produtos', (req,res) => {
 } )
 
 router.post('/produtos', (req, res) => {
-    const {nome, preco, estoque} = req.body;
-    createProdutos(nome, preco, estoque, (err, produto) => {
+    const {nome, preco} = req.body;
+    createProdutos(nome, preco, (err, produto) => {
         if (err) {
             res.status(500).send(err.message);
         } else {
@@ -25,8 +25,8 @@ router.post('/produtos', (req, res) => {
 })
 
 router.put('/produtos/:id', (req, res) => {
-    const {nome, preco, estoque} = req.body;
-    updateProdutos(req.params.id, nome, preco, estoque, (err) => {
+    const {nome, preco} = req.body;
+    updateProdutos(req.params.id, nome, preco,(err) => {
         if (err) {
             res.status(500).send(err.message);
         } else {
